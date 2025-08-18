@@ -9,7 +9,6 @@ public class UnderlineMenuOption : MonoBehaviour, IPointerEnterHandler, IPointer
 
     void Awake()
     {
-        // Look in children if TMP_Text is not on the same object
         tmpText = GetComponentInChildren<TMP_Text>();
         if (tmpText != null)
             originalText = tmpText.text;
@@ -19,11 +18,11 @@ public class UnderlineMenuOption : MonoBehaviour, IPointerEnterHandler, IPointer
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        tmpText.text = "<u>" + originalText + "</u>"; // Add underline
+        tmpText.text = "<u>" + originalText + "</u>";
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        tmpText.text = originalText; // Remove underline
+        tmpText.text = originalText;
     }
 }

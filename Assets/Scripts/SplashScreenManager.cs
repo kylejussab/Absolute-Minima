@@ -1,18 +1,16 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SplashScreenManager : MonoBehaviour
 {
-    [Header("Panels (with CanvasGroup)")]
-    public CanvasGroup splashKyle;
-    public CanvasGroup splashUnity;
-    public CanvasGroup splashTitle;
-    public CanvasGroup mainMenu;
-
     [Header("Settings")]
     public float transitionTime = 3.0f;
     public float fadeDuration = 0.5f;
+
+    [Header("Screen Panels")]
+    [SerializeField] private CanvasGroup splashKyle;
+    [SerializeField] private CanvasGroup splashUnity;
+    [SerializeField] private CanvasGroup splashTitle;
 
     void Start()
     {
@@ -39,15 +37,16 @@ public class SplashScreenManager : MonoBehaviour
         {
             yield return null;
         }
-
-        while (Input.GetMouseButton(0))
+        while (Input.GetMouseButton(0)) // prevent hold-click
         {
             yield return null;
         }
 
-        // Panel 4
+        // Fade out title
         yield return StartCoroutine(FadePanel(splashTitle, false));
-        yield return StartCoroutine(FadePanel(mainMenu, true));
+
+        // Load main menu scene
+        ScreenFader.Instance.FadeToScene("Main Menu");
     }
 
     IEnumerator FadePanel(CanvasGroup canvasGroup, bool fadeIn)
