@@ -12,66 +12,98 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Sprite defenseIcon;
     [SerializeField] private Sprite storyIcon;
 
-    public float playerMaxHealth = 100f;
-    public float playerCurrentHealth = 0f;
+    public float everythingBarMax = 100f;
+    public float playerMaxHealth = 0f;
+    public float playerHealth = 100f;
 
     private void Start()
     {
         // Example: populate starting items
         AddItem(new Item { name = "Paintbrush", type = "Attack", value = 15, icon = attackIcon });
         AddItem(new Item { name = "Key", type = "Story", value = 10, icon = storyIcon });
-        playerCurrentHealth = GetCurrentHealth();
+
+        playerMaxHealth = GetCurrentMaxHealth();
+        playerHealth = playerMaxHealth;
     }
 
     public void AddItem(Item item)
     {
-        equippedItems.Add(item);
-        playerCurrentHealth = GetCurrentHealth();
-        UpdateUI();
+        float projectedMax = playerMaxHealth - item.value;
+        if (projectedMax >= 1f)
+        {
+            equippedItems.Add(item);
+            RecalculateHealth();
+            UpdateUI();
+        }
     }
 
     public void RemoveItem(Item item)
     {
         equippedItems.Remove(item);
-        playerCurrentHealth = GetCurrentHealth();
+        RecalculateHealth();
         UpdateUI();
     }
 
     private void UpdateUI()
     {
-        // Clear old segments (you could add a ClearSegments() function in EverythingBarManager)
         barManager.ClearSegments();
 
-        // Re-add segments based on equipped items
         foreach (var item in equippedItems)
         {
             barManager.AddSegment(item.type, item.value, item.icon);
         }
     }
 
-    public float GetCurrentHealth()
+    public float GetCurrentMaxHealth()
     {
         float totalReduction = 0f;
+
         foreach (var item in equippedItems)
         {
-            totalReduction += item.value;
+            totalReduction += Mathf.Max(0f, item.value);
         }
 
-        return Mathf.Max(0f, playerMaxHealth - totalReduction);
+        return Mathf.Max(0f, everythingBarMax - totalReduction);
+    }
+
+    public void RecalculateHealth()
+    {
+        float previousMax = playerMaxHealth;
+        float previousHealth = playerHealth;
+
+        // Recalculate max health based on segments
+        playerMaxHealth = GetCurrentMaxHealth();
+
+        // Calculate damage taken relative to old max
+        float damageTaken = previousMax - previousHealth;
+
+        // Apply damage to new max, clamp so health is never above max
+        playerHealth = Mathf.Max(playerMaxHealth - damageTaken, 0f);
+
+        // Update the UI with the new health and max health
+        if (barManager != null)
+            barManager.UpdateHealth(playerHealth, playerMaxHealth);
     }
 
     // DEBUG
     private void Update()
     {
-        // Add items with keys
         if (Input.GetKeyDown(KeyCode.Alpha1))
             AddItem(new Item { name = "Debug Sword", type = "Attack", value = 10, icon = attackIcon });
 
         if (Input.GetKeyDown(KeyCode.Alpha2))
             AddItem(new Item { name = "Debug Shield", type = "Defense", value = 15, icon = defenseIcon });
 
-        // Remove last item
         if (Input.GetKeyDown(KeyCode.Alpha0) && equippedItems.Count > 0)
             RemoveItem(equippedItems[equippedItems.Count - 1]);
+
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            playerHealth -= 10f;
+            playerHealth = Mathf.Max(0f, playerHealth); // clamp so it never goes negative
+
+            // tell the bar manager to redraw with updated health
+            barManager.UpdateHealth(playerHealth, playerMaxHealth);
+        }
     }
 }

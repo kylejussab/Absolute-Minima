@@ -5,10 +5,10 @@ using System.Collections.Generic;
 [System.Serializable]
 public class BarSegment
 {
-    public string name;                      // e.g., "Defense", "Attack", "Story"
-    public float value = 0f;                 // The segment value
-    public RectTransform fill;               // The UI fill rectangle
-    public RectTransform icon;               // Icon above the bar
+    public string name;
+    public float value = 0f;
+    public RectTransform fill;
+    public RectTransform icon;
 }
 
 public class EverythingBarManager : MonoBehaviour
@@ -29,7 +29,9 @@ public class EverythingBarManager : MonoBehaviour
     [SerializeField] private float iconYOffset = -18f;
 
     [Header("Segment Prefab (optional)")]
-    [SerializeField] private GameObject segmentPrefab; // prefab containing fill & icon
+    [SerializeField] private GameObject segmentPrefab;
+
+    [SerializeField] private GameManager gm;
 
     private List<BarSegment> segments = new List<BarSegment>();
 
@@ -52,9 +54,6 @@ public class EverythingBarManager : MonoBehaviour
         return totalWidth;
     }
 
-    /// <summary>
-    /// Add a new segment dynamically from a prefab
-    /// </summary>
     public void AddSegment(string name, float value, Sprite iconSprite = null)
     {
         if (segmentPrefab == null)
@@ -65,7 +64,6 @@ public class EverythingBarManager : MonoBehaviour
 
         GameObject newSegGO = Instantiate(segmentPrefab, container);
 
-        // Prefab structure: root = fill, child = icon Image
         RectTransform fill = newSegGO.GetComponent<RectTransform>();
         RectTransform icon = newSegGO.transform.Find("Image")?.GetComponent<RectTransform>();
 
@@ -84,7 +82,6 @@ public class EverythingBarManager : MonoBehaviour
             icon = icon
         };
 
-        // Set icon sprite if provided
         if (icon != null && iconSprite != null)
         {
             Image img = icon.GetComponent<Image>();
@@ -92,7 +89,6 @@ public class EverythingBarManager : MonoBehaviour
                 img.sprite = iconSprite;
         }
 
-        // Reset positions
         seg.fill.anchoredPosition = new Vector2(0f, healthFill != null ? healthFill.anchoredPosition.y : 0f);
         if (seg.icon != null)
             seg.icon.anchoredPosition = new Vector2(0f, iconYOffset);
@@ -101,9 +97,6 @@ public class EverythingBarManager : MonoBehaviour
         UpdateBars();
     }
 
-    /// <summary>
-    /// Update value of an existing segment
-    /// </summary>
     public void SetSegmentValue(int index, float value)
     {
         if (index < 0 || index >= segments.Count) return;
@@ -122,49 +115,75 @@ public class EverythingBarManager : MonoBehaviour
         UpdateBars();
     }
 
-
     private void UpdateBars()
     {
         float width = GetTotalWidth();
 
-        // Sum of all segments
+        // Total of all item segments
         float sumSegments = 0f;
         foreach (var seg in segments)
             sumSegments += seg.value;
 
-        // Health is remainder
-        float healthValue = Mathf.Max(0f, maxValue - sumSegments);
+        // Health is the leftover (max available)
+        float maxAvailableHealth = Mathf.Max(0f, gm.everythingBarMax - sumSegments);
+
+        // Clamp current health if it's more than max available
+        if (gm.playerHealth > maxAvailableHealth)
+            gm.playerHealth = maxAvailableHealth;
 
         float xOffset = 0f;
 
         // Health
         if (healthFill != null)
         {
-            float healthWidth = width * (healthValue / maxValue);
+            // Health width should reflect actual current health, not max
+            float healthWidth = width * (gm.playerHealth / gm.everythingBarMax);
             healthFill.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, healthWidth);
             healthFill.anchoredPosition = new Vector2(xOffset, healthFill.anchoredPosition.y);
 
+            // Icon stays fixed at start
             if (healthIcon != null)
-                healthIcon.anchoredPosition = new Vector2(0f, iconYOffset); // local 0 stays centered
+                healthIcon.anchoredPosition = new Vector2(0f, iconYOffset);
 
-            xOffset += healthWidth;
+            xOffset += width * (maxAvailableHealth / gm.everythingBarMax);
         }
 
-        // Other segments
+        // Segments (attack, defense, story…)
         foreach (var seg in segments)
         {
-            float segWidth = width * (seg.value / maxValue);
+            float segWidth = width * (seg.value / gm.everythingBarMax);
 
             if (seg.fill != null)
             {
                 seg.fill.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, segWidth);
-                seg.fill.anchoredPosition = new Vector2(xOffset, healthFill != null ? healthFill.anchoredPosition.y : seg.fill.anchoredPosition.y);
+                seg.fill.anchoredPosition = new Vector2(
+                    xOffset,
+                    healthFill != null ? healthFill.anchoredPosition.y : seg.fill.anchoredPosition.y
+                );
             }
 
             if (seg.icon != null)
-                seg.icon.anchoredPosition = new Vector2(0f, iconYOffset); // local 0 stays centered
+                seg.icon.anchoredPosition = new Vector2(0f, iconYOffset);
 
             xOffset += segWidth;
         }
+    }
+
+    public void UpdateHealth(float currentHealth, float playerMaxHealth)
+    {
+        if (healthFill == null) return;
+
+        float totalWidthAvailable = GetTotalWidth();
+
+        float sumSegmentValues = 0f;
+        foreach (var seg in segments)
+            sumSegmentValues += seg.value;
+
+        float healthAreaWidth = Mathf.Max(0f, totalWidthAvailable - (totalWidthAvailable * (sumSegmentValues / gm.everythingBarMax)));
+
+        float currentHealthWidth = healthAreaWidth * Mathf.Clamp01(currentHealth / playerMaxHealth);
+
+        healthFill.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, currentHealthWidth);
+        healthFill.anchoredPosition = new Vector2(0f, healthFill.anchoredPosition.y);
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 public class DebugMenuUI : MonoBehaviour
 {
     public GameManager gameManager;
+    public TMP_Text everythingBarMaxText;
     public TMP_Text maxHealthText;
     public TMP_Text currentHealthText;
 
@@ -11,8 +12,9 @@ public class DebugMenuUI : MonoBehaviour
     {
         if (gameManager != null)
         {
+            everythingBarMaxText.text = $"{gameManager.everythingBarMax}";
             maxHealthText.text = $"{gameManager.playerMaxHealth}";
-            currentHealthText.text = $"{gameManager.playerCurrentHealth}";
+            currentHealthText.text = $"{gameManager.playerHealth}";
         }
     }
 }
