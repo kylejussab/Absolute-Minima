@@ -1524,7 +1524,7 @@ MonoBehaviour:
   healthIcon: {fileID: 114243479}
   iconYOffset: -40
   segmentPrefab: {fileID: 5564557487961346383, guid: f6e3e308985be4d7e85d400f81fba0c7, type: 3}
-  gm: {fileID: 804439965}
+  gameManager: {fileID: 804439965}
 --- !u!1 &1786822710
 GameObject:
   m_ObjectHideFlags: 0
