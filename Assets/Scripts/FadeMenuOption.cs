@@ -27,8 +27,8 @@ public class FadeMenuOption : MonoBehaviour
             alpha = eased;
         }
 
-        Color c = text.color;
-        c.a = alpha;
-        text.color = c;
+        Color color = text.color;
+        color.a = alpha;
+        text.color = color;
     }
 }

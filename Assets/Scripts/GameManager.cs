@@ -71,16 +71,12 @@ public class GameManager : MonoBehaviour
         float previousMax = playerMaxHealth;
         float previousHealth = playerHealth;
 
-        // Recalculate max health based on segments
         playerMaxHealth = GetCurrentMaxHealth();
 
-        // Calculate damage taken relative to old max
         float damageTaken = previousMax - previousHealth;
 
-        // Apply damage to new max, clamp so health is never above max
         playerHealth = Mathf.Max(playerMaxHealth - damageTaken, 0f);
 
-        // Update the UI with the new health and max health
         if (barManager != null)
             barManager.UpdateHealth(playerHealth, playerMaxHealth);
     }
@@ -100,9 +96,7 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.H))
         {
             playerHealth -= 10f;
-            playerHealth = Mathf.Max(0f, playerHealth); // clamp so it never goes negative
-
-            // tell the bar manager to redraw with updated health
+            playerHealth = Mathf.Max(0f, playerHealth);
             barManager.UpdateHealth(playerHealth, playerMaxHealth);
         }
     }

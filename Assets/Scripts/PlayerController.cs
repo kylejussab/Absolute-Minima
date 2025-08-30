@@ -44,8 +44,8 @@ public class PlayerController : MonoBehaviour
     private void HandleSpriteFlip()
     {
         if (movement.x > 0)
-            spriteRenderer.flipX = false; // face right
+            spriteRenderer.flipX = false;
         else if (movement.x < 0)
-            spriteRenderer.flipX = true;  // face left
+            spriteRenderer.flipX = true;
     }
 }
