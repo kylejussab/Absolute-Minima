@@ -12,32 +12,28 @@ public class ScreenFader : MonoBehaviour
 
     void Awake()
     {
-        // Singleton to persist across scenes
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
         else
-        {
             Destroy(gameObject);
-        }
     }
 
     void Start()
     {
-        // Start with a fade in
         StartCoroutine(FadeIn());
     }
 
     public IEnumerator FadeIn()
     {
-        yield return Fade(1, 0); // from black to clear
+        yield return Fade(1, 0);
     }
 
     public IEnumerator FadeOut()
     {
-        yield return Fade(0, 1); // from clear to black
+        yield return Fade(0, 1);
     }
 
     IEnumerator Fade(float start, float end)
@@ -52,7 +48,6 @@ public class ScreenFader : MonoBehaviour
         fadeCanvasGroup.alpha = end;
     }
 
-    // Helper to load scenes with fade
     public void FadeToScene(string sceneName)
     {
         StartCoroutine(FadeAndSwitchScene(sceneName));
@@ -60,13 +55,8 @@ public class ScreenFader : MonoBehaviour
 
     IEnumerator FadeAndSwitchScene(string sceneName)
     {
-        // Fade to black
         yield return FadeOut();
-
-        // Load next scene
         yield return SceneManager.LoadSceneAsync(sceneName);
-
-        // Fade back in
         yield return FadeIn();
     }
 }
