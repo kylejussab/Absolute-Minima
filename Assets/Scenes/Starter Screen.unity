@@ -470,6 +470,7 @@ GameObject:
   - component: {fileID: 203012713}
   - component: {fileID: 203012712}
   - component: {fileID: 203012711}
+  - component: {fileID: 203012715}
   m_Layer: 0
   m_Name: Linea
   m_TagString: Untagged
@@ -581,11 +582,56 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!61 &203012715
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203012710}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: -0.089784384, y: -0.28809685}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 2.56, y: 5.12}
+    newSize: {x: 0.7578125, y: 0.7578125}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1.8561571, y: 4.2909937}
+  m_EdgeRadius: 0
 --- !u!1 &293278421
 GameObject:
   m_ObjectHideFlags: 0
@@ -944,6 +990,7 @@ GameObject:
   m_Component:
   - component: {fileID: 804439966}
   - component: {fileID: 804439965}
+  - component: {fileID: 804439967}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -986,6 +1033,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &804439967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 804439964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 953d263560e764a00a0c6b234d3c59d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deadEndPrefab: {fileID: 6375984327789445235, guid: e9fde9fc1af24437c94d1409a94312e7, type: 3}
+  corridorPrefab: {fileID: 6375984327789445235, guid: be4a3f4403e3b4f00a36e1f44cb33b7f, type: 3}
+  cornerPrefab: {fileID: 6375984327789445235, guid: fce13726b1c25423ab5a45e017844cb6, type: 3}
+  forkPrefab: {fileID: 6375984327789445235, guid: afc535f57e06a4a25861cb2bacec1890, type: 3}
+  crossPrefab: {fileID: 6375984327789445235, guid: 51d874f6d236d41bc9fd6f0659ad0d96, type: 3}
+  backboneLength: 9
+  branchLength: 3
+  branchChance: 0.3
 --- !u!1 &1083689221
 GameObject:
   m_ObjectHideFlags: 0
