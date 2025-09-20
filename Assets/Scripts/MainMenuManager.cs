@@ -4,6 +4,6 @@ public class MainMenuManager : MonoBehaviour
 {
     public void NewRun()
     {
-        ScreenFader.Instance.FadeToScene("Starter Screen");
+        ScreenFader.Instance.FadeToScene("Overview Map");
     }
 }

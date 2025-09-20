@@ -18,6 +18,8 @@ public class UnderlineMenuOption : MonoBehaviour, IPointerEnterHandler, IPointer
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (tmpText != null)
+            originalText = tmpText.text;
         tmpText.text = "<u>" + originalText + "</u>";
     }
 

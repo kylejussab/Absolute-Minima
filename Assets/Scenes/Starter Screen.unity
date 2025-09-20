@@ -1052,7 +1052,7 @@ MonoBehaviour:
   crossPrefab: {fileID: 6375984327789445235, guid: 51d874f6d236d41bc9fd6f0659ad0d96, type: 3}
   backboneLength: 11
   branchLength: 2
-  branchChance: 0.613
+  branchChance: 0.3
 --- !u!1 &1083689221
 GameObject:
   m_ObjectHideFlags: 0
