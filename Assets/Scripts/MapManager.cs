@@ -63,6 +63,7 @@ public class MapManager : MonoBehaviour
     };
 
     public string currentLevel;
+    public HashSet<string> completedLevels = new HashSet<string>();
 
     public List<LevelData> Levels = new List<LevelData>();
     public LevelData selectedLevel;
@@ -82,6 +83,9 @@ public class MapManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         GenerateLevels();
+
+        // Temporary, add level 1 to the hash set
+        completedLevels.Add("1");
     }
 
     private void Start()
@@ -127,6 +131,9 @@ public class MapManager : MonoBehaviour
             LevelData level = new LevelData(number, chosenName);
             Levels.Add(level);
         }
+
+        // Add the final level
+        Levels.Add(new LevelData("6", "The Animator"));
     }
 
     public void ApplyLevelNamesToScene()
@@ -154,7 +161,7 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    public void SelectLevel(string levelKey)
+    public void SelectLevel(string levelKey, string levelState)
     {
         LevelData level = Levels.Find(l => l.LevelNumber == levelKey);
         if (level != null)
@@ -167,7 +174,10 @@ public class MapManager : MonoBehaviour
             if (notesLevelNumber != null)
                 notesLevelNumber.text = level.LevelNumber + ".";
 
-            playButton.gameObject.SetActive(true);
+            if(levelState == "possible")
+                playButton.gameObject.SetActive(true);
+            else
+                playButton.gameObject.SetActive(false);
         }
     }
 }

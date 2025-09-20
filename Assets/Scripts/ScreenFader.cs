@@ -8,7 +8,7 @@ public class ScreenFader : MonoBehaviour
 
     [Header("Fade Settings")]
     public CanvasGroup fadeCanvasGroup;
-    public float fadeDuration = 0.5f;
+    public float fadeDuration = 1f;
 
     void Awake()
     {
