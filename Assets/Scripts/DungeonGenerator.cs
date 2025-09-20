@@ -7,7 +7,7 @@ public class Room
     public int[] activeDoors; // [down, right, up, left]
     public int direction; // 0 = down, 1 = right, 2 = up, 3 = left
     public float size = 9.9f;
-    public int numberOfDoors;  // Delete if not used by branching algo
+    public int numberOfDoors;
     public GameObject prefab;
     public Vector2Int gridPosition;
     public GameObject instance;
@@ -72,14 +72,22 @@ public class DungeonGenerator : MonoBehaviour
     public GameObject forkPrefab;
     public GameObject crossPrefab;
 
-    [Header("Generation Settings")]
-    public int backboneLength = 3;
-    public int branchLength = 3;
-    [Range(0f, 1f)] public float branchChance = 0.3f;
-
+    [Header("Generation Settings")] // Turn all of the private when debug menu is deleted
+    public int backboneLength;
+    public float branchChance;
+    public (int min, int max) enemyRange;
+    public int levelReward;
 
     private List<Room> allRooms = new List<Room>();
     private HashSet<Vector2Int> occupiedSpaces = new HashSet<Vector2Int>();
+
+    private void Awake()
+    {
+        backboneLength = LevelSession.CurrentLevel.BackboneLength;
+        branchChance = LevelSession.CurrentLevel.BranchChance;
+        enemyRange = LevelSession.CurrentLevel.EnemyRange;
+        levelReward = LevelSession.CurrentLevel.Reward;
+    }
 
     void Start()
     {
@@ -145,45 +153,38 @@ public class DungeonGenerator : MonoBehaviour
 
     void GenerateBranches()
     {
-        foreach (Room room in allRooms)
+        for (int i = allRooms.Count - 1; i >= 0; i--)
         {
-            if (room.numberOfDoors == 1) continue;
+            Room room = allRooms[i];
 
+            if (room.numberOfDoors == 1) continue;
             if (UnityEngine.Random.value > branchChance) continue;
 
-            Debug.Log("We got at branch at room: " + allRooms.IndexOf(room));
-
-            // Pick a higher degree room, either a fork or cross, with more probabilty of a fork
-            Room branchRoom;
-
-            if (UnityEngine.Random.value < 0.7f)
-                branchRoom = new Room("fork", forkPrefab);
-            else
-                branchRoom = new Room("cross", crossPrefab);
+            // Pick a higher degree room, either a fork or cross
+            Room branchRoom = UnityEngine.Random.value < 0.7f ?
+                new Room("fork", forkPrefab) :
+                new Room("cross", crossPrefab);
 
             Vector2Int parentPos = room.gridPosition;
             branchRoom.gridPosition = parentPos;
 
-            // Rotate the branch room so that it still connects back
-            if(AlignRoomToPrevious(room, branchRoom))
+            if (AlignRoomToPrevious(room, branchRoom))
             {
                 allRooms.Add(branchRoom);
                 PlaceRoom(branchRoom, parentPos);
 
-                // Build the branch path
-
+                // Build branch path
                 List<int> newBranchDoors = new List<int>();
-                for (int i = 0; i < 4; i++)
+                for (int j = 0; j < 4; j++)
                 {
-                    if (branchRoom.activeDoors[i] == 1 && room.activeDoors[i] != 1)
-                        newBranchDoors.Add(i);
+                    if (branchRoom.activeDoors[j] == 1 && room.activeDoors[j] != 1)
+                        newBranchDoors.Add(j);
                 }
 
                 foreach (int door in newBranchDoors)
                 {
                     Vector2Int branchPos = parentPos + DirectionToVector(door);
 
-                    //For now, all it does is place a deadend
                     Room deadend = new Room("deadend", deadEndPrefab);
                     deadend.gridPosition = branchPos;
                     AlignRoomToPrevious(deadend, door, branchPos, occupiedSpaces);
@@ -192,13 +193,10 @@ public class DungeonGenerator : MonoBehaviour
                     PlaceRoom(deadend, branchPos);
                 }
 
-                // Once all is good then we can remove the inital room
-                allRooms.Remove(room);
+                // Remove original room
+                allRooms.RemoveAt(i);
                 Destroy(room.instance);
-            }
-            else
-            {
-                // Room couldn't be placed
+                return;
             }
         }
     }
@@ -264,7 +262,6 @@ public class DungeonGenerator : MonoBehaviour
                 Vector2Int checkPos = branchRoom.gridPosition + DirectionToVector(i);
                 if (occupiedSpaces.Contains(checkPos))
                 {
-                    Debug.Log("Room cannot be placed here");
                     return false;
                 }
             }
