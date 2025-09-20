@@ -9,6 +9,8 @@ public class Room
     public float size = 9.9f;
     public int numberOfDoors;  // Delete if not used by branching algo
     public GameObject prefab;
+    public Vector2Int gridPosition;
+    public GameObject instance;
 
     private string name;
    
@@ -82,6 +84,7 @@ public class DungeonGenerator : MonoBehaviour
     void Start()
     {
         GenerateBackbone();
+        GenerateBranches();
     }
 
     void GenerateBackbone()
@@ -140,6 +143,65 @@ public class DungeonGenerator : MonoBehaviour
         PlaceRoom(lastRoom, gridPosition);
     }
 
+    void GenerateBranches()
+    {
+        foreach (Room room in allRooms)
+        {
+            if (room.numberOfDoors == 1) continue;
+
+            if (UnityEngine.Random.value > branchChance) continue;
+
+            Debug.Log("We got at branch at room: " + allRooms.IndexOf(room));
+
+            // Pick a higher degree room, either a fork or cross, with more probabilty of a fork
+            Room branchRoom;
+
+            if (UnityEngine.Random.value < 0.7f)
+                branchRoom = new Room("fork", forkPrefab);
+            else
+                branchRoom = new Room("cross", crossPrefab);
+
+            Vector2Int parentPos = room.gridPosition;
+            branchRoom.gridPosition = parentPos;
+
+            // Rotate the branch room so that it still connects back
+            if(AlignRoomToPrevious(room, branchRoom))
+            {
+                allRooms.Add(branchRoom);
+                PlaceRoom(branchRoom, parentPos);
+
+                // Build the branch path
+
+                List<int> newBranchDoors = new List<int>();
+                for (int i = 0; i < 4; i++)
+                {
+                    if (branchRoom.activeDoors[i] == 1 && room.activeDoors[i] != 1)
+                        newBranchDoors.Add(i);
+                }
+
+                foreach (int door in newBranchDoors)
+                {
+                    Vector2Int branchPos = parentPos + DirectionToVector(door);
+
+                    //For now, all it does is place a deadend
+                    Room deadend = new Room("deadend", deadEndPrefab);
+                    deadend.gridPosition = branchPos;
+                    AlignRoomToPrevious(deadend, door, branchPos, occupiedSpaces);
+                    occupiedSpaces.Add(branchPos);
+                    allRooms.Add(deadend);
+                    PlaceRoom(deadend, branchPos);
+                }
+
+                // Once all is good then we can remove the inital room
+                allRooms.Remove(room);
+                Destroy(room.instance);
+            }
+            else
+            {
+                // Room couldn't be placed
+            }
+        }
+    }
 
     // Helper functions
     Vector2Int DirectionToVector(int direction)
@@ -156,9 +218,11 @@ public class DungeonGenerator : MonoBehaviour
 
     void PlaceRoom(Room room, Vector2Int position)
     {
+        room.gridPosition = position;
+
         Vector3 worldPos = new Vector3(position.x * room.size, position.y * room.size, 0);
         Quaternion rotation = Quaternion.Euler(0, 0, room.direction * 90);
-        Instantiate(room.prefab, worldPos, rotation, transform);
+        room.instance = Instantiate(room.prefab, worldPos, rotation, transform);
     }
 
     bool IsRotationValid(Room nextRoom, int prevExitDirection, Vector2Int gridPosition, HashSet<Vector2Int> occupiedSpaces)
@@ -185,14 +249,53 @@ public class DungeonGenerator : MonoBehaviour
         return true;
     }
 
-    void AlignRoomToPrevious(Room nextRoom, int prevExitDirection, Vector2Int gridPosition, HashSet<Vector2Int> occupiedSpaces)
+    bool IsRotationValid(Room previousRoom, Room branchRoom)
+    {
+        for(int i = 0; i < 4; i++)
+        {
+            if (previousRoom.activeDoors[i] == 1 && branchRoom.activeDoors[i] != 1) return false;
+        }
+
+        // Check if doors don't lead to closed rooms
+        for (int i = 0; i < 4; i++)
+        {
+            if (branchRoom.activeDoors[i] == 1 && previousRoom.activeDoors[i] != 1)
+            {
+                Vector2Int checkPos = branchRoom.gridPosition + DirectionToVector(i);
+                if (occupiedSpaces.Contains(checkPos))
+                {
+                    Debug.Log("Room cannot be placed here");
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    bool AlignRoomToPrevious(Room nextRoom, int prevExitDirection, Vector2Int gridPosition, HashSet<Vector2Int> occupiedSpaces)
     {
         for (int i = 0; i < 4; i++)
         {
             if (IsRotationValid(nextRoom, prevExitDirection, gridPosition, occupiedSpaces))
-                return;
+                return true;
 
             nextRoom.Rotate(90);
         }
+
+        return false;
+    }
+
+    bool AlignRoomToPrevious(Room previousRoom, Room branchRoom)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            if (IsRotationValid(previousRoom, branchRoom))
+                return true;
+
+            branchRoom.Rotate(90);
+        }
+
+        return false;
     }
 }
