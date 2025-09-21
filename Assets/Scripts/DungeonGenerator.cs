@@ -45,6 +45,11 @@ public class Room
             this.activeDoors = new int[] { 1, 1, 1, 1 };
             this.numberOfDoors = 4;
         }
+        else if (name == "levelend")
+        {
+            this.activeDoors = new int[] { 1, 0, 0, 0 };
+            this.numberOfDoors = 1;
+        }
     }
 
     public void Rotate(int rotation)
@@ -71,6 +76,7 @@ public class DungeonGenerator : MonoBehaviour
     public GameObject cornerPrefab;
     public GameObject forkPrefab;
     public GameObject crossPrefab;
+    public GameObject levelEndPrefab;
 
     [Header("Generation Settings")] // Turn all of the private when debug menu is deleted
     public int backboneLength;
@@ -140,7 +146,7 @@ public class DungeonGenerator : MonoBehaviour
         }
 
         // Last room
-        Room lastRoom = new Room("deadend", deadEndPrefab);
+        Room lastRoom = new Room("levelend", levelEndPrefab);
         lastRoom.Rotate(new int[] { 0, 90, 180, 270 }[UnityEngine.Random.Range(0, 4)]);
 
         gridPosition += moveVector;

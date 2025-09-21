@@ -607,7 +607,7 @@ GameObject:
   - component: {fileID: 203012715}
   m_Layer: 0
   m_Name: Linea
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1462,6 +1462,7 @@ MonoBehaviour:
   cornerPrefab: {fileID: 6375984327789445235, guid: fce13726b1c25423ab5a45e017844cb6, type: 3}
   forkPrefab: {fileID: 6375984327789445235, guid: afc535f57e06a4a25861cb2bacec1890, type: 3}
   crossPrefab: {fileID: 6375984327789445235, guid: 51d874f6d236d41bc9fd6f0659ad0d96, type: 3}
+  levelEndPrefab: {fileID: 6375984327789445235, guid: ca866fbcbda494a2f918ddb5c0123bc9, type: 3}
   backboneLength: 11
   branchChance: 0.3
   levelReward: 0

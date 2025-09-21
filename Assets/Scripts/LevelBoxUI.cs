@@ -108,7 +108,7 @@ public class LevelBoxUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     void SetCompletedLevels()
     {
-        if (MapManager.Instance.completedLevels.Contains(levelKey))
+        if (LevelSession.completedLevels.Contains(levelKey))
         {
             background.GetComponent<UnityEngine.UI.Image>().raycastTarget = false;
 
@@ -125,7 +125,7 @@ public class LevelBoxUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     void SetPossibleLevels()
     {
-        if (MapManager.Instance.completedLevels.Count == 0)
+        if (LevelSession.completedLevels.Count == 0)
         {
             if (levelKey.StartsWith("1"))
             {
@@ -143,7 +143,7 @@ public class LevelBoxUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         }
 
         int highestCompleted = 0;
-        foreach (string completed in MapManager.Instance.completedLevels)
+        foreach (string completed in LevelSession.completedLevels)
         {
             if (int.TryParse(completed.Substring(0, 1), out int num))
                 if (num > highestCompleted)
@@ -158,7 +158,7 @@ public class LevelBoxUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     void SetImpossibleLevels()
     {
-        if (MapManager.Instance.completedLevels.Contains("2a"))
+        if (LevelSession.completedLevels.Contains("2a"))
         {
             if (levelKey == "2b" || levelKey == "3c" || levelKey == "3d" || levelKey == "4c" || levelKey == "5d")
             {
@@ -176,7 +176,7 @@ public class LevelBoxUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                 
         }
 
-        if (MapManager.Instance.completedLevels.Contains("2b"))
+        if (LevelSession.completedLevels.Contains("2b"))
         {
             if (levelKey == "2a" || levelKey == "3a" || levelKey == "3b" || levelKey == "4a" || levelKey == "5a")
             {
@@ -194,7 +194,7 @@ public class LevelBoxUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
         }
 
-        if (MapManager.Instance.completedLevels.Contains("3a"))
+        if (LevelSession.completedLevels.Contains("3a"))
         {
             if (levelKey == "3b" || levelKey == "4b" || levelKey == "5b" || levelKey == "5c")
             {
@@ -212,7 +212,7 @@ public class LevelBoxUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
         }
 
-        if (MapManager.Instance.completedLevels.Contains("3b"))
+        if (LevelSession.completedLevels.Contains("3b"))
         {
             if (levelKey == "3a" || levelKey == "4a" || levelKey == "5a")
             {
@@ -229,7 +229,7 @@ public class LevelBoxUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             }
         }
 
-        if (MapManager.Instance.completedLevels.Contains("3c"))
+        if (LevelSession.completedLevels.Contains("3c"))
         {
             if (levelKey == "3d" || levelKey == "4c" || levelKey == "5d")
             {
@@ -246,7 +246,7 @@ public class LevelBoxUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             }
         }
 
-        if (MapManager.Instance.completedLevels.Contains("3d"))
+        if (LevelSession.completedLevels.Contains("3d"))
         {
             if (levelKey == "3c" || levelKey == "4b" || levelKey == "5b" || levelKey == "5c")
             {
@@ -264,7 +264,7 @@ public class LevelBoxUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
         }
 
-        if (MapManager.Instance.completedLevels.Contains("5b"))
+        if (LevelSession.completedLevels.Contains("5b"))
         {
             if (levelKey == "5c")
             {
@@ -282,7 +282,7 @@ public class LevelBoxUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
         }
 
-        if (MapManager.Instance.completedLevels.Contains("5c"))
+        if (LevelSession.completedLevels.Contains("5c"))
         {
             if (levelKey == "5b")
             {

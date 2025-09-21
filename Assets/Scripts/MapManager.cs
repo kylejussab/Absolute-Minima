@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System.Collections;
 
 [System.Serializable]
 public class LevelData
@@ -66,14 +67,12 @@ public class MapManager : MonoBehaviour
 
     private string[] LevelNames = new string[]
     {
-        "Ink Spill",
         "Paper Tear",
         "Rough Sketch",
         "Blank Page",
         "Faded Line",
         "Torn Edge",
         "Graphite Mark",
-        "Ink Blot",
         "Shaded Margin",
         "Empty Spread",
         "Smudged Stroke",
@@ -93,17 +92,26 @@ public class MapManager : MonoBehaviour
         "Shadowed Page",
         "Broken Sketch",
         "Paper Grain",
-        "Ink Trail",
         "Faint Grid",
-        "Skipped Line"
+        "Skipped Line",
+        "Artistic Dream",
+        "Canvas Whispers",
+        "Color Burst",
+        "Palette Echo",
+        "Abstract Flow",
+        "Painted Horizon",
+        "Creative Spark",
+        "Brush Strokes",
+        "Vision Fragment",
+        "Chromatic Pulse"
     };
 
     public string currentLevel;
-    public HashSet<string> completedLevels = new HashSet<string>();
 
-    public List<LevelData> Levels = new List<LevelData>();
     public LevelData selectedLevel;
 
+    private TMP_Text inkDropsText;
+    private Button backButton;
     private TMP_Text notesLevelName;
     private TMP_Text notesLevelNumber;
     private TMP_Text notesOne;
@@ -122,34 +130,53 @@ public class MapManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         GenerateLevels();
-
-        // Temporary, add level 1 to the hash set
-        completedLevels.Add("1");
-        completedLevels.Add("2a");
     }
 
-    private void Start()
+    private void OnEnable()
     {
-        if (SceneManager.GetActiveScene().name == "Overview Map")
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "Overview Map")
         {
-            notesLevelName = GameObject.Find("Non-Clickables").transform.Find("Notes Level Name").GetComponent<TMP_Text>();
-            notesLevelNumber = GameObject.Find("Non-Clickables").transform.Find("Notes Level Number").GetComponent<TMP_Text>();
-            notesOne = GameObject.Find("Non-Clickables").transform.Find("Note (1)").GetComponent<TMP_Text>();
-            notesTwo = GameObject.Find("Non-Clickables").transform.Find("Note (2)").GetComponent<TMP_Text>();
-            notesThree = GameObject.Find("Non-Clickables").transform.Find("Note (3)").GetComponent<TMP_Text>();
-            playButton = GameObject.Find("Play").GetComponent<Button>();
-
-            selectedLevel = null;
-            playButton.gameObject.SetActive(false);
-
-            ApplyLevelNamesToScene();
+            StartCoroutine(InitOverviewMapUI());
         }
     }
 
-    private void GenerateLevels()
+    private IEnumerator InitOverviewMapUI()
     {
-        Levels.Clear();
+        yield return null;
 
+        inkDropsText = GameObject.Find("Non-Clickables").transform.Find("Ink Drops Number").GetComponent<TMP_Text>();
+        inkDropsText.text = LevelSession.InkDrops + " ink drops";
+
+        backButton = GameObject.Find("Back Button").GetComponent<Button>();
+        backButton.onClick.RemoveAllListeners();
+
+        backButton.onClick.AddListener(() => { ScreenFader.Instance.FadeToScene("Main Menu"); });
+
+        notesLevelName = GameObject.Find("Non-Clickables").transform.Find("Notes Level Name").GetComponent<TMP_Text>();
+        notesLevelNumber = GameObject.Find("Non-Clickables").transform.Find("Notes Level Number").GetComponent<TMP_Text>();
+        notesOne = GameObject.Find("Non-Clickables").transform.Find("Note (1)").GetComponent<TMP_Text>();
+        notesTwo = GameObject.Find("Non-Clickables").transform.Find("Note (2)").GetComponent<TMP_Text>();
+        notesThree = GameObject.Find("Non-Clickables").transform.Find("Note (3)").GetComponent<TMP_Text>();
+        playButton = GameObject.Find("Play").GetComponent<Button>();
+
+        selectedLevel = null;
+        playButton.gameObject.SetActive(false);
+
+        ApplyLevelNamesToScene();
+    }
+
+    public void GenerateLevels()
+    {
         string[] levelNumbers =
         {
             "1",
@@ -182,16 +209,16 @@ public class MapManager : MonoBehaviour
 
             LevelData level = new LevelData(number, chosenName, backboneLength, branchChance, (minEnemies, maxEnemies));
 
-            Levels.Add(level);
+            LevelSession.Levels.Add(level);
         }
 
         // Add the final level
-        Levels.Add(new LevelData("6", "The Animator", 0, 0.0f, (0, 0)));
+        LevelSession.Levels.Add(new LevelData("6", "The Animator", 0, 0.0f, (0, 0)));
     }
 
     public void ApplyLevelNamesToScene()
     {
-        foreach (LevelData level in Levels)
+        foreach (LevelData level in LevelSession.Levels)
         {
             GameObject levelObj = GameObject.Find("Level " + level.LevelNumber);
 
@@ -216,7 +243,7 @@ public class MapManager : MonoBehaviour
 
     public void SelectLevel(string levelKey, string levelState)
     {
-        LevelData level = Levels.Find(l => l.LevelNumber == levelKey);
+        LevelData level = LevelSession.Levels.Find(l => l.LevelNumber == levelKey);
         if (level != null)
         {
             selectedLevel = level;
@@ -228,7 +255,7 @@ public class MapManager : MonoBehaviour
             {
                 notesOne.text = "Number of rooms: " + level.BackboneLength;
                 notesTwo.text = "Shop chance: " + Mathf.Round(level.BranchChance * 100f) + "%";
-                notesThree.text = "Reward: " + level.Reward + "i";
+                notesThree.text = "Reward: " + level.Reward + " ink drops";
             }
             else
             {
@@ -272,12 +299,12 @@ public class MapManager : MonoBehaviour
     {
         switch (levelNum)
         {
-            case 1: return (0.20f, 0.30f);
-            case 2: return (0.30f, 0.45f);
-            case 3: return (0.45f, 0.60f);
-            case 4: return (0.60f, 0.70f);
-            case 5: return (0.70f, 0.80f);
-            default: return (0.20f, 0.80f);
+            case 1: return (0.02f, 0.06f);
+            case 2: return (0.05f, 0.12f);
+            case 3: return (0.10f, 0.20f);
+            case 4: return (0.20f, 0.30f);
+            case 5: return (0.25f, 0.40f);
+            default: return (0.05f, 0.25f);
         }
     }
 
@@ -293,11 +320,20 @@ public class MapManager : MonoBehaviour
             default: return (12, 18);
         }
     }
-
-    
 }
 
 public static class LevelSession
 {
     public static LevelData CurrentLevel;
+    public static int InkDrops = 0;
+    public static List<LevelData> Levels = new List<LevelData>();
+    public static HashSet<string> completedLevels = new HashSet<string>();
+
+    public static void Reset()
+    {
+        CurrentLevel = null;
+        InkDrops = 0;
+        Levels.Clear();
+        completedLevels.Clear();
+    }
 }
