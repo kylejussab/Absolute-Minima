@@ -321,19 +321,3 @@ public class MapManager : MonoBehaviour
         }
     }
 }
-
-public static class LevelSession
-{
-    public static LevelData CurrentLevel;
-    public static int InkDrops = 0;
-    public static List<LevelData> Levels = new List<LevelData>();
-    public static HashSet<string> completedLevels = new HashSet<string>();
-
-    public static void Reset()
-    {
-        CurrentLevel = null;
-        InkDrops = 0;
-        Levels.Clear();
-        completedLevels.Clear();
-    }
-}

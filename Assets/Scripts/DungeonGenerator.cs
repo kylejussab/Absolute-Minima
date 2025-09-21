@@ -12,7 +12,7 @@ public class Room
     public Vector2Int gridPosition;
     public GameObject instance;
 
-    private string name;
+    public string name;
    
     public Room(string name, GameObject prefab)
     {
@@ -50,6 +50,11 @@ public class Room
             this.activeDoors = new int[] { 1, 0, 0, 0 };
             this.numberOfDoors = 1;
         }
+        else if (name == "shop")
+        {
+            this.activeDoors = new int[] { 1, 0, 0, 0 };
+            this.numberOfDoors = 1;
+        }
     }
 
     public void Rotate(int rotation)
@@ -77,6 +82,9 @@ public class DungeonGenerator : MonoBehaviour
     public GameObject forkPrefab;
     public GameObject crossPrefab;
     public GameObject levelEndPrefab;
+    public GameObject shopPrefab;
+    public GameObject exitPromptUI;
+    public GameObject enterShopPromptUI;
 
     [Header("Generation Settings")] // Turn all of the private when debug menu is deleted
     public int backboneLength;
@@ -191,12 +199,12 @@ public class DungeonGenerator : MonoBehaviour
                 {
                     Vector2Int branchPos = parentPos + DirectionToVector(door);
 
-                    Room deadend = new Room("deadend", deadEndPrefab);
-                    deadend.gridPosition = branchPos;
-                    AlignRoomToPrevious(deadend, door, branchPos, occupiedSpaces);
+                    Room shop = new Room("shop", shopPrefab);
+                    shop.gridPosition = branchPos;
+                    AlignRoomToPrevious(shop, door, branchPos, occupiedSpaces);
                     occupiedSpaces.Add(branchPos);
-                    allRooms.Add(deadend);
-                    PlaceRoom(deadend, branchPos);
+                    allRooms.Add(shop);
+                    PlaceRoom(shop, branchPos);
                 }
 
                 // Remove original room
@@ -227,6 +235,18 @@ public class DungeonGenerator : MonoBehaviour
         Vector3 worldPos = new Vector3(position.x * room.size, position.y * room.size, 0);
         Quaternion rotation = Quaternion.Euler(0, 0, room.direction * 90);
         room.instance = Instantiate(room.prefab, worldPos, rotation, transform);
+
+        if(room.name == "levelend")
+        {
+            ExitTrigger exitTrigger = room.instance.GetComponentInChildren<ExitTrigger>();
+            exitTrigger.SetUIPrompt(exitPromptUI);
+        }
+
+        if (room.name == "shop")
+        {
+            ShopTrigger enterShopTrigger = room.instance.GetComponentInChildren<ShopTrigger>();
+            enterShopTrigger.SetUIPrompt(enterShopPromptUI);
+        }
     }
 
     bool IsRotationValid(Room nextRoom, int prevExitDirection, Vector2Int gridPosition, HashSet<Vector2Int> occupiedSpaces)

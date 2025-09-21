@@ -44,7 +44,11 @@ public class EverythingBarManager : MonoBehaviour
     private void OnValidate()
     {
         if (container == null) container = (RectTransform)transform;
-        UpdateBars();
+        if (Application.isPlaying)
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded += (scene, mode) =>
+            {
+                UpdateBars();
+            };
     }
 
     private float GetTotalWidth()
@@ -118,27 +122,27 @@ public class EverythingBarManager : MonoBehaviour
         foreach (var segment in segments)
             sumSegments += segment.value;
 
-        float maxAvailableHealth = Mathf.Max(0f, gameManager.everythingBarMax - sumSegments);
+        float maxAvailableHealth = Mathf.Max(0f, LevelSession.EverythingBarMax - sumSegments);
 
-        if (gameManager.playerHealth > maxAvailableHealth) gameManager.playerHealth = maxAvailableHealth;
+        if (LevelSession.PlayerHealth > maxAvailableHealth) LevelSession.PlayerHealth = maxAvailableHealth;
 
         float xOffset = 0f;
 
         if (healthFill != null)
         {
-            float healthWidth = width * (gameManager.playerHealth / gameManager.everythingBarMax);
+            float healthWidth = width * (LevelSession.PlayerHealth / LevelSession.EverythingBarMax);
             healthFill.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, healthWidth);
             healthFill.anchoredPosition = new Vector2(xOffset, healthFill.anchoredPosition.y);
 
             if (healthIcon != null)
                 healthIcon.anchoredPosition = new Vector2(0f, iconYOffset);
 
-            xOffset += width * (maxAvailableHealth / gameManager.everythingBarMax);
+            xOffset += width * (maxAvailableHealth / LevelSession.EverythingBarMax);
         }
 
         foreach (var segment in segments)
         {
-            float segWidth = width * (segment.value / gameManager.everythingBarMax);
+            float segWidth = width * (segment.value / LevelSession.EverythingBarMax);
 
             if (segment.fill != null)
             {
@@ -166,7 +170,7 @@ public class EverythingBarManager : MonoBehaviour
         foreach (var segment in segments)
             sumSegmentValues += segment.value;
 
-        float healthAreaWidth = Mathf.Max(0f, totalWidthAvailable - (totalWidthAvailable * (sumSegmentValues / gameManager.everythingBarMax)));
+        float healthAreaWidth = Mathf.Max(0f, totalWidthAvailable - (totalWidthAvailable * (sumSegmentValues / LevelSession.EverythingBarMax)));
 
         float currentHealthWidth = healthAreaWidth * Mathf.Clamp01(currentHealth / playerMaxHealth);
 
