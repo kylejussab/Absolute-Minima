@@ -22,6 +22,7 @@ public class DialogueManager : MonoBehaviour
     public GameObject dialoguePanel;
     public TextMeshProUGUI actorName;
     public TextMeshProUGUI messageText;
+    public TextMeshProUGUI continueText;
 
     [Header("Portraits")]
     public Image lineaPortrait;
@@ -37,7 +38,7 @@ public class DialogueManager : MonoBehaviour
 
     void Start()
     {
-        dialoguePanel.SetActive(true);
+
     }
 
     void Update()
@@ -46,7 +47,6 @@ public class DialogueManager : MonoBehaviour
 
         if (isWritingMessage && Input.GetKeyDown(KeyCode.Space))
         {
-            // Skip typewriter effect
             dialogueSpeed = 0f;
         }
         else if (Input.GetKeyDown(KeyCode.Space) && !isWritingMessage)
@@ -103,6 +103,7 @@ public class DialogueManager : MonoBehaviour
 
     private IEnumerator WriteSentence(string message)
     {
+        continueText.gameObject.SetActive(false);
         isWritingMessage = true;
 
         foreach (char c in message.ToCharArray())
@@ -111,6 +112,7 @@ public class DialogueManager : MonoBehaviour
             yield return new WaitForSeconds(dialogueSpeed);
         }
 
+        continueText.gameObject.SetActive(true);
         isWritingMessage = false;
     }
 }
