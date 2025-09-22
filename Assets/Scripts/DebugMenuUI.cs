@@ -17,9 +17,9 @@ public class DebugMenuUI : MonoBehaviour
     {
         if (gameManager != null && dungeonGenerator != null)
         {
-            everythingBarMaxText.text = $"{gameManager.everythingBarMax}";
-            maxHealthText.text = $"{gameManager.playerMaxHealth}";
-            currentHealthText.text = $"{gameManager.playerHealth}";
+            everythingBarMaxText.text = $"{LevelSession.EverythingBarMax}";
+            maxHealthText.text = $"{LevelSession.PlayerMaxHealth}";
+            currentHealthText.text = $"{LevelSession.PlayerHealth}";
 
             roomsText.text = $"{dungeonGenerator.backboneLength}";
             shopText.text = $"{Mathf.Round(dungeonGenerator.branchChance * 100)}";
