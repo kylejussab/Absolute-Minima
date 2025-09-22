@@ -14,6 +14,7 @@ public static class LevelSession
     public static float EverythingBarMax = 100f;
     public static float PlayerMaxHealth = 100f;
     public static float PlayerHealth = 100f;
+    public static bool inConversation = false;
 
     // --- Reset everything at the start of a new run ---
     public static void Reset()

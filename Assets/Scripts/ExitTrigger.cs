@@ -4,12 +4,11 @@ public class ExitTrigger : MonoBehaviour
 {
     private bool playerInside = false;
     private GameObject uiPrompt;
-    private float yOffset = 2.5f;
+    private float yOffset = 1.5f;
 
     public void SetUIPrompt(GameObject prompt)
     {
         uiPrompt = prompt;
-        // Optionally, ensure the UI is initially hidden.
         uiPrompt.SetActive(false);
     }
 
