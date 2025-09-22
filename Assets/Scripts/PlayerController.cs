@@ -22,12 +22,14 @@ public class PlayerController : MonoBehaviour
     {
         movement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
 
-        HandleSpriteFlip();
+        if (!LevelSession.inConversation)
+            HandleSpriteFlip();
     }
 
     void FixedUpdate()
     {
-        Move();
+        if(!LevelSession.inConversation)
+            Move();
     }
 
     private void Move()
